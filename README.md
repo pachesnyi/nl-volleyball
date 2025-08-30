@@ -1,11 +1,12 @@
 # Volleyball Matches App 🏐
 
-A modern web application for registering and managing friendly volleyball matches. Built with Next.js, Firebase, and Framer Motion.
+A modern web application for registering and managing friendly volleyball matches. Built with Next.js, NextUI, Firebase, and Framer Motion.
 
 ## Features
 
 - **Google OAuth Authentication** - Secure sign-in with Google accounts
 - **User Role Management** - Support for Admin, User, Guest, and Cherry roles
+- **NextUI Components** - Beautiful, modern UI components with consistent design
 - **Responsive Design** - Clean, modern interface that works on all devices
 - **Smooth Animations** - Delightful interactions powered by Framer Motion
 - **Real-time Updates** - Firebase Firestore for live data synchronization
@@ -54,6 +55,38 @@ A modern web application for registering and managing friendly volleyball matche
 5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+## Testing the Application
+
+1. **Sign in with Google** using the authentication button
+2. **First-time setup**: If you're the first user, you'll see a "Make Me Admin" button to grant yourself admin privileges
+3. **Test user roles**:
+   - **Guest**: New users start as guests and need approval
+   - **Admin**: Can access `/admin` to manage user roles
+   - **User/Cherry**: Can access main features (to be implemented)
+
+## Current Features
+
+✅ **Authentication System**
+- Google OAuth integration
+- User registration and profile management
+- Role-based access control
+
+✅ **User Management**
+- Four-tier role system (guest → cherry → user → admin)
+- Admin panel for managing user roles at `/admin`
+- Automatic guest role assignment for new users
+
+✅ **Modern UI/UX**
+- NextUI component library for consistent design
+- Responsive design with Tailwind CSS
+- Smooth animations with Framer Motion
+- Clean, accessible interface
+
+✅ **Development Ready**
+- TypeScript for type safety
+- ESLint for code quality
+- Next.js 14+ with Turbopack for fast development
+
 ## User Roles
 
 - **Guest**: Can view upcoming games but cannot join until approved by admin
@@ -64,6 +97,7 @@ A modern web application for registering and managing friendly volleyball matche
 ## Tech Stack
 
 - **Frontend**: Next.js 14+ with TypeScript
+- **UI Components**: NextUI v2
 - **Authentication**: Firebase Auth with Google OAuth
 - **Database**: Firebase Firestore
 - **Styling**: Tailwind CSS
@@ -102,8 +136,16 @@ This is the first iteration (MVP) of the volleyball app. Future features to impl
 - Payment tracking with Tikkie integration
 - Google Calendar integration
 - Location management with Google Maps
-- Admin panel for user management
 - Email notifications
+
+## Available Commands
+
+```bash
+bun dev          # Start development server
+bun run build    # Build for production
+bun run start    # Start production server
+bun run lint     # Run ESLint
+```
 
 ## Contributing
 

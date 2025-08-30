@@ -12,11 +12,13 @@ export interface User {
 
 export interface Game {
   id: string;
+  title: string;
   date: Date;
   location: {
     name: string;
     address: string;
     googleMapsUrl: string;
+    coordinates?: { lat: number; lng: number; };
   };
   maxPlayers: number;
   price: number;
@@ -26,8 +28,10 @@ export interface Game {
   status: 'upcoming' | 'cancelled' | 'archived';
   createdBy: string;
   createdAt: Date;
+  updatedAt: Date;
   needsBall: boolean;
   needsSpeaker: boolean;
+  calendarEventId?: string;
 }
 
 export interface GamePlayer {

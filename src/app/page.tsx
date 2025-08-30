@@ -1,147 +1,143 @@
-'use client';
+"use client";
 
-import { Layout } from '@/components/layout/Layout';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/Button';
-import { motion } from 'framer-motion';
+import { Layout } from "@/components/layout/Layout";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/Button";
+import { ClientOnly } from "@/components/ClientOnly";
+import { Card, CardContent, CardHeader, CircularProgress, Box, Typography, Alert } from "@mui/material";
 
 export default function Home() {
+  return (
+    <Layout>
+      <ClientOnly
+        fallback={
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <CircularProgress size={60} color="primary" />
+          </Box>
+        }
+      >
+        <HomeContent />
+      </ClientOnly>
+    </Layout>
+  );
+}
+
+function HomeContent() {
   const { user, loading } = useAuth();
+
+  console.log("HomeContent render:", { user, loading });
 
   if (loading) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      </Layout>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <CircularProgress size={60} color="primary" />
+      </Box>
     );
   }
 
   if (!user) {
     return (
-      <Layout>
-        <motion.div 
-          className="text-center py-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="max-w-md mx-auto">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-6xl mb-6"
-            >
-              🏐
-            </motion.div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Welcome to Volleyball Matches
-            </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              Join friendly volleyball matches in your area. Sign in to get started!
-            </p>
-          </div>
-        </motion.div>
-      </Layout>
+      <Box sx={{ textAlign: 'center', py: 5 }}>
+        <Box sx={{ maxWidth: '400px', mx: 'auto' }}>
+          <Box sx={{ fontSize: '4rem', mb: 3 }}>
+            🏐
+          </Box>
+          <Typography variant="h3" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
+            NL Volleyball
+          </Typography>
+        </Box>
+      </Box>
     );
   }
 
-  if (user.role === 'guest') {
+  if (user.role === "guest") {
     return (
-      <Layout>
-        <motion.div 
-          className="text-center py-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="max-w-md mx-auto">
-            <div className="text-4xl mb-6">⏳</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Welcome, {user.name}!
-            </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              Your account is pending approval. An administrator will review your request soon.
-            </p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-sm text-yellow-800">
-                You can view upcoming games but cannot join until approved.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </Layout>
+      <Box sx={{ textAlign: 'center', py: 8 }}>
+        <Box sx={{ maxWidth: '400px', mx: 'auto' }}>
+          <Box sx={{ fontSize: '4rem', mb: 3 }}>⏳</Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Welcome, {user.name}!
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
+            Your account is pending approval. An administrator will review your
+            request soon.
+          </Typography>
+          <Alert severity="warning">
+            You can view upcoming games but cannot join until approved.
+          </Alert>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <Layout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user.name}!
-          </h1>
-          <p className="text-lg text-gray-600">
-            Ready for your next volleyball match?
-          </p>
-        </div>
+    <Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 'bold', mb: 1 }}>
+          Welcome back, {user.name}!
+        </Typography>
+        <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+          Ready for your next volleyball match?
+        </Typography>
+      </Box>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <motion.div
-            className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+        <Card sx={{ height: '100%' }}>
+          <CardHeader sx={{ pb: 1 }}>
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
               Upcoming Games
-            </h3>
-            <p className="text-gray-600 mb-4">
+            </Typography>
+          </CardHeader>
+          <CardContent sx={{ pt: 0 }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
               View and join upcoming volleyball matches.
-            </p>
-            <div className="text-2xl text-blue-600 font-bold">3</div>
-            <p className="text-sm text-gray-500">Available this week</p>
-          </motion.div>
+            </Typography>
+            <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 'bold', mb: 0.5 }}>
+              3
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Available this week
+            </Typography>
+          </CardContent>
+        </Card>
 
-          <motion.div
-            className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <Card sx={{ height: '100%' }}>
+          <CardHeader sx={{ pb: 1 }}>
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
               My Games
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Games you've registered for.
-            </p>
-            <div className="text-2xl text-green-600 font-bold">1</div>
-            <p className="text-sm text-gray-500">Joined</p>
-          </motion.div>
+            </Typography>
+          </CardHeader>
+          <CardContent sx={{ pt: 0 }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+              Games you&apos;ve registered for.
+            </Typography>
+            <Typography variant="h4" sx={{ color: 'success.main', fontWeight: 'bold', mb: 0.5 }}>
+              1
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Joined
+            </Typography>
+          </CardContent>
+        </Card>
 
-          {(user.role === 'admin') && (
-            <motion.div
-              className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        {user.role === "admin" && (
+          <Card sx={{ height: '100%' }}>
+            <CardHeader sx={{ pb: 1 }}>
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
                 Admin Panel
-              </h3>
-              <p className="text-gray-600 mb-4">
+              </Typography>
+            </CardHeader>
+            <CardContent sx={{ pt: 0 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
                 Manage games and users.
-              </p>
-              <Button size="sm">
+              </Typography>
+              <Button size="small" color="primary">
                 Manage
               </Button>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
-    </Layout>
+            </CardContent>
+          </Card>
+        )}
+      </Box>
+    </Box>
   );
 }

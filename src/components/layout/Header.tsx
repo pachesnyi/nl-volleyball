@@ -1,65 +1,151 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/Button';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Button,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
+import { devProps } from "@/lib/dev-helpers";
+import { Menu as MenuIcon } from "@mui/icons-material";
+import { UserProfile } from "./UserProfile";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function Header() {
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const menuItems = [
+    { name: "Home", href: "/" },
+    { name: "Registrations", href: "/registrations" },
+  ];
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  const toggleDrawer =
+    (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+      if (
+        event.type === "keydown" &&
+        ((event as React.KeyboardEvent).key === "Tab" ||
+          (event as React.KeyboardEvent).key === "Shift")
+      ) {
+        return;
+      }
+      setIsMenuOpen(open);
+    };
 
   return (
-    <motion.header 
-      className="bg-white shadow-sm border-b"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <motion.div 
-            className="flex items-center"
-            whileHover={{ scale: 1.05 }}
+    <Box {...devProps("Header")}>
+      <AppBar
+        position="static"
+        sx={{
+          bgcolor: "background.paper",
+          color: "text.primary",
+          boxShadow: 1,
+        }}
+        {...devProps("AppBar")}
+      >
+        <Toolbar {...devProps("Toolbar")}>
+          {/* Mobile menu toggle */}
+          {isMobile && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={toggleDrawer(true)}
+              sx={{ mr: 2, display: { sm: "none" } }}
+              {...devProps("MobileMenuToggle")}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+
+          {/* Desktop navigation */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", sm: "flex" },
+              justifyContent: "center",
+              gap: 2,
+            }}
+            {...devProps("DesktopNavigation")}
           >
-            <h1 className="text-xl font-bold text-gray-900">🏐 Volleyball Matches</h1>
-          </motion.div>
-          
-          <div className="flex items-center space-x-4">
-            {loading ? (
-              <div className="h-8 w-8 animate-pulse bg-gray-200 rounded-full"></div>
-            ) : user ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  {user.photoURL ? (
-                    <img 
-                      src={user.photoURL} 
-                      alt={user.name}
-                      className="h-8 w-8 rounded-full"
-                    />
-                  ) : (
-                    <UserCircleIcon className="h-8 w-8 text-gray-400" />
-                  )}
-                  <div className="hidden sm:block">
-                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                  </div>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={signOut}
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                passHref
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  color={pathname === item.href ? "primary" : "inherit"}
+                  variant={pathname === item.href ? "outlined" : "text"}
                 >
-                  Sign Out
+                  {item.name}
                 </Button>
-              </div>
-            ) : (
-              <Button onClick={signInWithGoogle}>
-                Sign In with Google
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.header>
+              </Link>
+            ))}
+          </Box>
+
+          {/* User profile */}
+          <Box sx={{ ml: "auto" }} {...devProps("UserProfileContainer")}>
+            <UserProfile />
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Mobile drawer */}
+      <Drawer
+        anchor="left"
+        open={isMenuOpen}
+        onClose={toggleDrawer(false)}
+        {...devProps("MobileDrawer")}
+      >
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={toggleDrawer(false)}
+          onKeyDown={toggleDrawer(false)}
+          {...devProps("MobileDrawerContent")}
+        >
+          <List>
+            {menuItems.map((item) => (
+              <ListItem key={item.href} disablePadding>
+                <Link
+                  href={item.href}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    width: "100%",
+                  }}
+                >
+                  <ListItemButton selected={pathname === item.href}>
+                    <ListItemText primary={item.name} />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+    </Box>
   );
 }
+
+Header.displayName = "Header";

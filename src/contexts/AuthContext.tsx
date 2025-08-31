@@ -31,24 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      console.log('🔑 Starting Google sign in...');
       const result = await signInWithPopup(auth, provider);
-      console.log('✅ Google sign in successful:', result.user.email);
       await handleUserLogin(result.user);
     } catch (error: unknown) {
-      console.error("❌ Error signing in with Google:", error);
-      
       const authError = error as { code?: string; message?: string };
       
       if (authError.code === 'auth/configuration-not-found') {
-        console.error('Firebase Auth configuration not found. Please check:');
-        console.error('1. Firebase project has Authentication enabled');
-        console.error('2. Google provider is configured');
-        console.error('3. Web app is properly registered');
         alert('Authentication not configured. Please check Firebase setup.');
-      } else if (authError.code === 'auth/popup-closed-by-user') {
-        console.log('User closed the popup');
-      } else {
+      } else if (authError.code !== 'auth/popup-closed-by-user') {
         alert(`Sign in failed: ${authError.message || 'Unknown error'}`);
       }
       
@@ -74,6 +64,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (userDoc.exists()) {
         const userData = userDoc.data() as User;
+        // Convert createdAt string back to Date if needed
+        if (typeof userData.createdAt === 'string') {
+          userData.createdAt = new Date(userData.createdAt);
+        }
         setUser(userData);
       } else {
         const newUser: User = {
@@ -94,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Error handling user login:", error);
+      
       // If Firestore fails, still set basic user info from Firebase Auth
       const basicUser: User = {
         id: firebaseUser.uid,

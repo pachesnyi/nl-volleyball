@@ -177,10 +177,18 @@ export const subscribeToGames = (
     
     const q = query(gameQuery, ...constraints);
     
-    return onSnapshot(q, (snapshot) => {
-      const games = snapshot.docs.map(doc => transformGameFromFirestore(doc));
-      callback(games);
-    });
+    return onSnapshot(
+      q, 
+      (snapshot) => {
+        const games = snapshot.docs.map(doc => transformGameFromFirestore(doc));
+        callback(games);
+      },
+      (error) => {
+        console.error('Firestore subscription error:', error);
+        // Call callback with empty array on error
+        callback([]);
+      }
+    );
   } catch (error) {
     console.error('Error subscribing to games:', error);
     throw error;

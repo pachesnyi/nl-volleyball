@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { QueryProvider } from '@/providers/QueryProvider';
 import { theme, darkTheme } from '@/theme/theme';
 import { useEffect, useState } from 'react';
 
@@ -36,9 +37,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider attribute="class" defaultTheme="light" themes={['light', 'dark']}>
       <MuiThemeProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </MuiThemeProvider>
     </NextThemesProvider>
   );

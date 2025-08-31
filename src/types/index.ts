@@ -43,3 +43,17 @@ export interface GamePlayer {
   willBringBall: boolean;
   willBringSpeaker: boolean;
 }
+
+export interface GameFormData {
+  title: string;
+  date: Date;
+  location: {
+    name: string;
+    address: string;
+    googleMapsUrl: string;
+  };
+  maxPlayers: number;
+  price: number;
+  needsBall: boolean;
+  needsSpeaker: boolean;
+}

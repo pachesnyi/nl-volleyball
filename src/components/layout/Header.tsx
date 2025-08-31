@@ -29,10 +29,7 @@ export function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const menuItems = [
-    { name: "Home", href: "/" },
-    { name: "Registrations", href: "/registrations" },
-  ];
+  const menuItems = [{ name: "Home", href: "/" }];
 
   useEffect(() => {
     console.log(user);

@@ -3,38 +3,28 @@
 import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/Button";
-import { getAllUsers, updateUserRole } from "@/lib/utils";
-import { User, UserRole } from "@/types";
-import { useEffect, useState } from "react";
+import { UserRole } from "@/types";
+import { useState } from "react";
+import { useUsers, useUpdateUserRole } from "@/hooks";
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user?.role === "admin") {
-      loadUsers();
-    }
-  }, [user]);
-
-  const loadUsers = async () => {
-    try {
-      const allUsers = await getAllUsers();
-      setUsers(allUsers);
-    } catch (error) {
-      console.error("Error loading users:", error);
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
+  // Use TanStack Query hooks
+  const { 
+    data: users = [], 
+    isLoading: loadingUsers 
+  } = useUsers({
+    enabled: user?.role === "admin", // Only fetch if user is admin
+  });
+  
+  const updateRoleMutation = useUpdateUserRole();
 
   const handleRoleUpdate = async (userId: string, newRole: UserRole) => {
     setUpdating(userId);
     try {
-      await updateUserRole(userId, newRole);
-      await loadUsers(); // Refresh the list
+      await updateRoleMutation.mutateAsync({ userId, newRole });
     } catch (error) {
       console.error("Error updating user role:", error);
     } finally {
@@ -73,6 +63,14 @@ export default function AdminPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h1>
           <p className="text-lg text-gray-600">Manage users and their roles</p>
+          <div className="mt-4 flex gap-3">
+            <Button 
+              variant="outlined" 
+              onClick={() => window.location.href = '/games'}
+            >
+              Manage Games
+            </Button>
+          </div>
         </div>
 
         {loadingUsers ? (
@@ -132,22 +130,22 @@ export default function AdminPage() {
                             {userItem.role === "guest" && (
                               <>
                                 <Button
-                                  size="sm"
-                                  variant="bordered"
+                                  size="small"
+                                  variant="outlined"
                                   onClick={() =>
                                     handleRoleUpdate(userItem.id, "cherry")
                                   }
-                                  isLoading={updating === userItem.id}
+                                  disabled={updating === userItem.id}
                                 >
                                   Approve as Cherry
                                 </Button>
                                 <Button
-                                  size="sm"
+                                  size="small"
                                   color="primary"
                                   onClick={() =>
                                     handleRoleUpdate(userItem.id, "user")
                                   }
-                                  isLoading={updating === userItem.id}
+                                  disabled={updating === userItem.id}
                                 >
                                   Approve as User
                                 </Button>
@@ -155,24 +153,24 @@ export default function AdminPage() {
                             )}
                             {userItem.role === "cherry" && (
                               <Button
-                                size="sm"
+                                size="small"
                                 color="primary"
                                 onClick={() =>
                                   handleRoleUpdate(userItem.id, "user")
                                 }
-                                isLoading={updating === userItem.id}
+                                disabled={updating === userItem.id}
                               >
                                 Promote to User
                               </Button>
                             )}
                             {userItem.role !== "admin" && (
                               <Button
-                                size="sm"
+                                size="small"
                                 color="secondary"
                                 onClick={() =>
                                   handleRoleUpdate(userItem.id, "admin")
                                 }
-                                isLoading={updating === userItem.id}
+                                disabled={updating === userItem.id}
                               >
                                 Make Admin
                               </Button>
